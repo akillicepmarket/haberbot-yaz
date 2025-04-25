@@ -1,0 +1,35 @@
+name: Haberleri Güncelle
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # Her 6 saatte bir çalışacak
+  workflow_dispatch:  # Elle tetikleme seçeneği
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Depoyu klonla
+      uses: actions/checkout@v3
+
+    - name: Python kur
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Gerekli paketleri yükle
+      run: |
+        pip install feedparser
+
+    - name: Haberleri çek ve güncelle
+      run: |
+        python haber_cek.py
+
+    - name: Değişiklikleri GitHub'a kaydet
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        git add haberler.html
+        git commit -m "Otomatik haber güncellemesi"
+        git push
